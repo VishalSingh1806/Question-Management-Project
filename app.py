@@ -97,10 +97,12 @@ def get_questions():
         rows = cursor.fetchall()
         conn.close()
         questions = [{"question": row[0], "answer": row[1]} for row in rows]
+        print(f"Fetched questions: {questions}")  # Debug log
         return jsonify({"questions": questions})
     except Exception as e:
-        print(f"Error fetching questions: {e}")
+        print(f"Error fetching questions: {e}")  # Debug log
         return jsonify({"error": "Failed to fetch questions"}), 500
+
 
 
 
