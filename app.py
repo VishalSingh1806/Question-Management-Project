@@ -16,7 +16,7 @@ CORS(app)
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
 # Database constants
-DB_PATH = r"/root/Question-Management-Project/database/knowledge_base.db"
+DB_PATH = r"/root/Question-Management-Project/knowledge_base.db"
 SIMILARITY_THRESHOLD = 0.7
 logging.basicConfig(level=logging.DEBUG)
 
