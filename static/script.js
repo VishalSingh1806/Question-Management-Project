@@ -59,7 +59,6 @@ async function fetchQuestions() {
     }
 }
 
-// Load Specific Question
 document.getElementById("loadQuestionButton").addEventListener("click", function () {
     const questionNumber = parseInt(
         document.getElementById("questionNumberInput").value.trim(),
@@ -71,7 +70,9 @@ document.getElementById("loadQuestionButton").addEventListener("click", function
         return;
     }
 
+    console.log(`Question Number Entered: ${questionNumber}`); // Debug log
     if (isNaN(questionNumber) || questionNumber <= 0 || questionNumber > dbQuestions.length) {
+        console.log("Invalid question number entered."); // Debug log
         alert("Invalid question number.");
         return;
     }
@@ -80,6 +81,7 @@ document.getElementById("loadQuestionButton").addEventListener("click", function
     displayCurrentQuestion();
     document.getElementById("questionAnswerSection").style.display = "block";
 });
+
 
 // Display Current Question
 function displayCurrentQuestion() {
