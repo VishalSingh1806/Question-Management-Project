@@ -4,6 +4,7 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
 from flask import Flask, render_template, request, jsonify
+from asgiref.wsgi import WsgiToAsgi
 from flask_cors import CORS
 
 # Flask app
@@ -157,6 +158,8 @@ def add_to_database():
         print(f"Error in /add route: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
+# Wrap Flask app as ASGI for Uvicorn
+asgi_app = WsgiToAsgi(app)
 
 # --- Run App ---
 if __name__ == "__main__":
