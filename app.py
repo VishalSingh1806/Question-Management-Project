@@ -6,6 +6,7 @@ from sentence_transformers import SentenceTransformer
 from flask import Flask, render_template, request, jsonify
 from asgiref.wsgi import WsgiToAsgi
 from flask_cors import CORS
+import logging
 
 # Flask app
 app = Flask(__name__)
@@ -17,7 +18,7 @@ model = SentenceTransformer("all-MiniLM-L6-v2")
 # Database constants
 DB_PATH = r"/root/Question-Management-Project/database/knowledge_base.db"
 SIMILARITY_THRESHOLD = 0.7
-
+logging.basicConfig(level=logging.DEBUG)
 
 # --- Utility Functions ---
 def connect_db():
