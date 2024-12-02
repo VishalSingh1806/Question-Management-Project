@@ -14,7 +14,7 @@ CORS(app)
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
 # Database constants
-DB_PATH = r"D:\EPR Data\Updated db'\knowledge_base.db"
+DB_PATH = r"/root/Question-Management-Project/database/knowledge_base.db"
 SIMILARITY_THRESHOLD = 0.7
 
 
