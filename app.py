@@ -53,11 +53,14 @@ def save_or_update_db(conn, question, answer, embedding):
                 "INSERT INTO ValidatedQA (question, answer, embedding) VALUES (?, ?, ?)",
                 (question, answer, embedding.tobytes()),
             )
-        conn.commit()  # Ensure changes are committed
-        logging.debug("Successfully saved or updated the question-answer pair.")
-    except Exception as e:
+        
+        conn.commit()  # Explicitly commit the transaction
+        logging.debug("Changes committed to the database.")
+    except sqlite3.Error as e:
+        conn.rollback()  # Rollback if there is an error
         logging.error(f"Error saving or updating to DB: {e}")
         raise
+
 
 
 def query_validated_qa(user_embedding):
@@ -156,18 +159,18 @@ def add_to_database():
         finally:
             conn.close()
 
-        # Query to verify the update
+        # Verify the update
         conn = connect_db()
         cursor = conn.cursor()
         cursor.execute("SELECT id, question, answer FROM ValidatedQA WHERE question = ?", (question,))
         result = cursor.fetchone()
         conn.close()
 
-        if result:
-            logging.debug(f"Updated entry: {result}")
-        else:
-            logging.debug(f"Question not found or update failed: {question}")
+        if not result:
+            logging.error(f"Failed to update or find the question: {question}")
+            return jsonify({"error": "Failed to update the question in the database."}), 500
 
+        logging.debug(f"Updated entry: {result}")
         return jsonify({"message": "Answer submitted and saved successfully!", "updated_entry": result})
     except Exception as e:
         logging.error(f"Error in /add route: {e}")
