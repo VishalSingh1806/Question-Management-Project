@@ -41,22 +41,22 @@ def save_or_update_db(conn, question, answer, embedding):
         
         if result:
             # Update the existing row
-            print(f"Updating answer for question: {question}")
+            logging.debug(f"Updating answer for question: {question}")
             cursor.execute(
                 "UPDATE ValidatedQA SET answer = ?, embedding = ? WHERE id = ?",
                 (answer, embedding.tobytes(), result[0]),
             )
         else:
             # Insert a new row
-            print(f"Inserting new question-answer pair: {question}")
+            logging.debug(f"Inserting new question-answer pair: {question}")
             cursor.execute(
                 "INSERT INTO ValidatedQA (question, answer, embedding) VALUES (?, ?, ?)",
                 (question, answer, embedding.tobytes()),
             )
-        conn.commit()
-        print("Successfully saved or updated the question-answer pair.")
+        conn.commit()  # Ensure changes are committed
+        logging.debug("Successfully saved or updated the question-answer pair.")
     except Exception as e:
-        print(f"Error saving or updating to DB: {e}")
+        logging.error(f"Error saving or updating to DB: {e}")
         raise
 
 
@@ -143,12 +143,10 @@ def add_to_database():
     """Add or update a question-answer pair in the database."""
     try:
         data = request.json
-        print(f"Incoming Data: {data}")  # Debug incoming request
         question = data.get("question", "").strip()
         answer = data.get("answer", "").strip()
 
         if not question or not answer:
-            print("Validation Failed: Question or Answer is missing.")
             return jsonify({"error": "Both question and answer are required."}), 400
 
         # Compute embedding for the question
@@ -161,10 +159,22 @@ def add_to_database():
         finally:
             conn.close()
 
-        print(f"Question '{question}' updated or added successfully.")
-        return jsonify({"message": "Answer submitted and saved successfully!"})
+        # Query to verify the update
+        conn = connect_db()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM ValidatedQA WHERE question = ?", (question,))
+        result = cursor.fetchone()
+        if not result:
+            logging.debug(f"Question not found: {question}")
+        logging.debug(f"Updated entry: {result}")
+        #updated_entry = cursor.fetchone()
+        conn.close()
+
+        logging.debug(f"Updated entry: {updated_entry}")
+
+        return jsonify({"message": "Answer submitted and saved successfully!", "updated_entry": updated_entry})
     except Exception as e:
-        print(f"Error in /add route: {e}")
+        logging.error(f"Error in /add route: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
 # Wrap Flask app as ASGI for Uvicorn
