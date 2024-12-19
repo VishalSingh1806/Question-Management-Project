@@ -21,7 +21,7 @@ DB_CONFIG = {
     'user': 'singh',
     'password': 'Tech123',
     'database': 'knowledge_base',
-    'host': '192.168.153.169',  # Use the WSL IP
+    'host': 'localhost',  # Replace with your server IP or hostname if needed
     'port': 5432
 }
 
@@ -75,6 +75,24 @@ async def preload_database():
     logging.debug(f"Current preloaded data: {preloaded_data}")
 
 
+async def initialize_database():
+    """Initialize the database using schema and seed data files."""
+    try:
+        # Load and execute schema
+        with open("schema.sql", "r") as schema_file:
+            schema = schema_file.read()
+        await db_repo.execute_query(schema)
+
+        # Load and execute seed data
+        with open("seed_data.sql", "r") as seed_file:
+            seed_data = seed_file.read()
+        await db_repo.execute_query(seed_data)
+
+        logging.info("Database initialized successfully from SQL files.")
+    except Exception as e:
+        logging.error(f"Error initializing database from SQL files: {e}")
+        raise
+
 
 async def save_or_update_question(db_repo, question, answer, embedding):
     """Save or update a QA pair in the database."""
@@ -104,7 +122,6 @@ async def save_or_update_question(db_repo, question, answer, embedding):
     except Exception as e:
         logging.error(f"Error saving or updating question in database: {e}")
         raise
-
 
 
 async def fetch_best_match(user_embedding):
@@ -212,16 +229,7 @@ if __name__ == "__main__":
     # Ensure the database table exists
     async def ensure_table():
         try:
-            await db_repo.execute_query(
-                """
-                CREATE TABLE IF NOT EXISTS ValidatedQA (
-                    id SERIAL PRIMARY KEY,
-                    question TEXT UNIQUE,
-                    answer TEXT,
-                    embedding BYTEA
-                )
-                """
-            )
+            await initialize_database()
             await preload_database()  # Preload data on startup
         except Exception as e:
             logging.error(f"Error ensuring database table exists: {e}")
