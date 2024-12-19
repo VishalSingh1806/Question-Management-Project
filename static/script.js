@@ -59,41 +59,41 @@ async function fetchQuestions() {
     }
 }
 
-// Load Specific Question
 document.getElementById("loadQuestionButton").addEventListener("click", function () {
-    const questionNumber = parseInt(
-        document.getElementById("questionNumberInput").value.trim(),
-        10
-    );
+    const questionNumber = parseInt(document.getElementById("questionNumberInput").value.trim(), 10);
 
     if (!dbQuestions.length) {
         alert("Questions not loaded yet.");
         return;
     }
 
+    console.log(`Question Number Entered: ${questionNumber}`); // Debug log
+
     if (isNaN(questionNumber) || questionNumber <= 0 || questionNumber > dbQuestions.length) {
-        alert("Invalid question number.");
+        console.log("Invalid question number entered."); // Debug log
+        alert(`Invalid question number. Please enter a number between 1 and ${dbQuestions.length}`);
         return;
     }
 
-    currentIndex = questionNumber - 1;
+    currentIndex = questionNumber - 1; // Zero-based index
     displayCurrentQuestion();
     document.getElementById("questionAnswerSection").style.display = "block";
 });
 
+
+
 // Display Current Question
 function displayCurrentQuestion() {
     const questionObj = dbQuestions[currentIndex];
-    const questionNumber = currentIndex + 1; // Convert zero-based index to one-based
+    const questionNumber = currentIndex + 1; // Convert to 1-based index
 
-    // Update the question number and question text
-    document.getElementById("currentQuestionNumber").innerText = `Question ${questionNumber}:`;
-    document.getElementById("currentQuestion").innerText = questionObj.question;
+    document.getElementById("currentQuestion").innerHTML = `<strong>Question ${questionNumber}:</strong> ${questionObj.question}`;
     document.getElementById("currentAnswer").innerText = questionObj.answer;
-
-    // Clear the custom answer input
     document.getElementById("refineCustomAnswer").value = "";
+
+    console.log(`Displaying Question ${questionNumber}: ${questionObj.question}`); // Debug log
 }
+
 
 
 document.getElementById("submitAnswer").addEventListener("click", async function () {
